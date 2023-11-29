@@ -3,9 +3,10 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Button from "@mui/material/Button";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
+import HeaderDropMenu from "./HeaderDropMenu";
 
 function Header() {
-  const [state, setState] = useState(true);
+  const [state, setState] = useState(false);
 
   return (
     <div className="w-full p-2   bg-slate-900 shadow-lg border-blue-300 ">
@@ -19,12 +20,12 @@ function Header() {
               Task Name
             </span>
             {state ? (
-              <ArrowDropDownIcon
+              <ArrowDropUpIcon
                 className="w-3 ml-2 cursor-pointer  md:hidden text-white "
                 onClick={() => setState(!state)}
               />
             ) : (
-              <ArrowDropUpIcon
+              <ArrowDropDownIcon
                 className="w-3 ml-2 cursor-pointer  md:hidden text-white "
                 onClick={() => setState(true)}
 
@@ -38,6 +39,12 @@ function Header() {
           <MoreVertIcon className="text-white my-3 mx-3 text-2xl cursor-pointer" />
         </div>
       </div>
+      {/* // ArrowDropDown menu for small screen */}
+      {
+
+        state && <HeaderDropMenu setState = {setState} />
+
+      }
     </div>
   );
 }
