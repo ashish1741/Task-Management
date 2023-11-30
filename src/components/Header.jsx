@@ -4,8 +4,9 @@ import Button from "@mui/material/Button";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import HeaderDropMenu from "./HeaderDropMenu";
+import AddEditModals from "../modals/addEditModals";
 
-function Header() {
+function Header({setTaskModelOpen, taskModelOpen}) {
   const [state, setState] = useState(false);
 
   return (
@@ -39,11 +40,17 @@ function Header() {
           <MoreVertIcon className="text-white my-3 mx-3 text-2xl cursor-pointer" />
         </div>
       </div>
+
+      
       {/* // ArrowDropDown menu for small screen */}
+
       {
 
-        state && <HeaderDropMenu setState = {setState} />
+        state && <HeaderDropMenu  setTaskModelOpen = {setTaskModelOpen} setState = {setState} />
 
+      }
+      {
+        taskModelOpen &&  <AddEditModals setTaskModelOpen = {setTaskModelOpen} />
       }
     </div>
   );
