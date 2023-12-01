@@ -1,10 +1,14 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import categoriesSlice from "../redux/categoriesSlice";
 
-function HeaderDropMenu({ setOpenDropDown, setTaskModelOpen }) {
+
+function HeaderDropMenu({ setOpenDropDown, setTaskModelOpen }){
+  const dispatch = useDispatch()
   const categories = useSelector((state) => state.categories);
+  
 
 
   return (
@@ -24,13 +28,13 @@ function HeaderDropMenu({ setOpenDropDown, setTaskModelOpen }) {
         </h3>
         <div>
           {categories.map((ele, index) => {
-            console.log(ele.isActive);
             return (
               <div
-                className={`flex  space-x-2  px-5 py-5 ${
+                className={`flex  space-x-2 md:ml-3  px-5 py-5 ${
                   ele.isActive && "bg-[#635fc7] rounded-r-full text-white mr-8"
                 }`}
                 key={index}
+                onClick={() => dispatch(categoriesSlice.actions.settaskActive({index}))}
               >
                 <AssignmentIcon className="text-white" />
                 <p className="text-lg font- bold text-white">{ele.name}</p>

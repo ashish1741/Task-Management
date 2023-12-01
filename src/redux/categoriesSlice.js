@@ -2,113 +2,120 @@ import { createSlice } from "@reduxjs/toolkit";
 import data from "../data/data.json"
 
 
-
-
-
-
-
-
   const categoriesSlice = createSlice({
     name: "categories",
     initialState: data.categories,
     reducers:{
-      //write our reducers here 
-      reducers: {
-        addBoard: (state, action) => {
-          const isActive = state.length > 0 ? false : true;
-          const payload = action.payload;
-          const board = {
-            name: payload.name,
-            isActive,
-            columns: [],
-          };
-          board.columns = payload.newColumns;
-          state.push(board);
-        },
-        editBoard: (state, action) => {
-          const payload = action.payload;
-          const board = state.find((board) => board.isActive);
-          board.name = payload.name;
-          board.columns = payload.newColumns;
-        },
-        deleteBoard: (state) => {
-          const board = state.find((board) => board.isActive);
-          state.splice(state.indexOf(board), 1);
-        },
-        setBoardActive: (state, action) => {
-          state.map((board, index) => {
-            index === action.payload.index
-              ? (board.isActive = true)
-              : (board.isActive = false);
-            return board;
-          });
-        },
-        addTask: (state, action) => {
-          const { title, status, description, subtasks, newColIndex } =
-            action.payload;
-          const task = { title, description, subtasks, status };
-          const board = state.find((board) => board.isActive);
-          const column = board.columns.find((col, index) => index === newColIndex);
-          column.tasks.push(task);
-        },
-        editTask: (state, action) => {
-          const {
-            title,
-            status,
-            description,
-            subtasks,
-            prevColIndex,
-            newColIndex,
-            taskIndex,
-          } = action.payload;
-          const board = state.find((board) => board.isActive);
-          const column = board.columns.find((col, index) => index === prevColIndex);
-          const task = column.tasks.find((task, index) => index === taskIndex);
-          task.title = title;
-          task.status = status;
-          task.description = description;
-          task.subtasks = subtasks;
-          if (prevColIndex === newColIndex) return;
-          column.tasks = column.tasks.filter((task, index) => index !== taskIndex);
-          const newCol = board.columns.find((col, index) => index === newColIndex);
-          newCol.tasks.push(task);
-        },
-        dragTask: (state, action) => {
-          const { colIndex, prevColIndex, taskIndex } = action.payload;
-          const board = state.find((board) => board.isActive);
-          const prevCol = board.columns.find((col, i) => i === prevColIndex);
-          const task = prevCol.tasks.splice(taskIndex, 1)[0];
-          board.columns.find((col, i) => i === colIndex).tasks.push(task);
-        },
-        setSubtaskCompleted: (state, action) => {
-          const payload = action.payload;
-          const board = state.find((board) => board.isActive);
-          const col = board.columns.find((col, i) => i === payload.colIndex);
-          const task = col.tasks.find((task, i) => i === payload.taskIndex);
-          const subtask = task.subtasks.find((subtask, i) => i === payload.index);
-          subtask.isCompleted = !subtask.isCompleted;
-        },
-        setTaskStatus: (state, action) => {
-          const payload = action.payload;
-          const board = state.find((board) => board.isActive);
-          const columns = board.columns;
-          const col = columns.find((col, i) => i === payload.colIndex);
-          if (payload.colIndex === payload.newColIndex) return;
-          const task = col.tasks.find((task, i) => i === payload.taskIndex);
-          task.status = payload.status;
-          col.tasks = col.tasks.filter((task, i) => i !== payload.taskIndex);
-          const newCol = columns.find((col, i) => i === payload.newColIndex);
-          newCol.tasks.push(task);
-        },
-        deleteTask: (state, action) => {
-          const payload = action.payload;
-          const board = state.find((board) => board.isActive);
-          const col = board.columns.find((col, i) => i === payload.colIndex);
-          col.tasks = col.tasks.filter((task, i) => i !== payload.taskIndex);
-        },
-      },
+    addTask: (state, action) => {
+      const isActive = state.length > 0 ? false : true;
+      const payload = action.payload;
+      const task = {
+        name: payload.name,
+        isActive,
+        columns: [],
+      };
+      task.columns = payload.newColumns;
+      state.push(task);
+    },
+    editTask: (state, action) => {
+      const payload = action.payload;
+      const task = state.find((task) => task.isActive);
+      task.name = payload.name;
+      task.columns = payload.newColumns;
+    },
+    deleteTask: (state) => {
+      const task = state.find((task) => task.isActive);
+      state.splice(state.indexOf(task), 1);
+    },
+    settaskActive: (state, action) => {
+      state.map((task, index) => {
+        index === action.payload.index
+          ? (task.isActive = true)
+          : (task.isActive = false);
+        return task;
+      });
+    },
+    addactivity: (state, action) => {
+      const { title, description, subtasks, status, newColIndex } = action.payload;
 
-    }
+      const activity = { title, description, subtasks, status };
+
+      const activeCategory = state.find((category) => category.isActive);
+
+      if (activeCategory) {
+        const column = activeCategory.columns.find((col, index) => index === newColIndex);
+
+        if (column) {
+          if (!column.tasks) {
+            column.tasks = [];
+          }
+          column.tasks.push(activity);
+        } else {
+          console.error(`Column at index ${newColIndex} not found.`);
+        }
+      } else {
+        console.error("Active category not found.");
+      }
+    },
+    editactivity: (state, action) => {
+      const {
+        title,
+        status,
+        description,
+        subactivitys,
+        prevColIndex,
+        newColIndex,
+        activityIndex,
+      } = action.payload;
+      const task = state.find((task) => task.isActive);
+      const column = task.columns.find((col, index) => index === prevColIndex);
+      const activity = column.activitys.find((activity, index) => index === activityIndex);
+      activity.title = title;
+      activity.status = status;
+      activity.description = description;
+      activity.subactivitys = subactivitys;
+      if (prevColIndex === newColIndex) return;
+      column.activitys = column.activitys.filter((activity, index) => index !== activityIndex);
+      const newCol = task.columns.find((col, index) => index === newColIndex);
+      newCol.activitys.push(activity);
+    },
+    dragactivity: (state, action) => {
+      const { colIndex, prevColIndex, activityIndex } = action.payload;
+      const task = state.find((task) => task.isActive);
+      const prevCol = task.columns.find((col, i) => i === prevColIndex);
+      const activity = prevCol.activitys.splice(activityIndex, 1)[0];
+      task.columns.find((col, i) => i === colIndex).activitys.push(activity);
+    },
+    setSubactivityCompleted: (state, action) => {
+      const payload = action.payload;
+      const task = state.find((task) => task.isActive);
+      const col = task.columns.find((col, i) => i === payload.colIndex);
+      const activity = col.activitys.find((activity, i) => i === payload.activityIndex);
+      const subactivity = activity.subactivitys.find((subactivity, i) => i === payload.index);
+      subactivity.isCompleted = !subactivity.isCompleted;
+    },
+    setactivityStatus: (state, action) => {
+      const payload = action.payload;
+      const task = state.find((task) => task.isActive);
+      const columns = task.columns;
+      const col = columns.find((col, i) => i === payload.colIndex);
+      if (payload.colIndex === payload.newColIndex) return;
+      const activity = col.activitys.find((activity, i) => i === payload.activityIndex);
+      activity.status = payload.status;
+      col.activitys = col.activitys.filter((activity, i) => i !== payload.activityIndex);
+      const newCol = columns.find((col, i) => i === payload.newColIndex);
+      newCol.activitys.push(activity);
+    },
+    deleteactivity: (state, action) => {
+      const payload = action.payload;
+      const task = state.find((task) => task.isActive);
+      const col = task.columns.find((col, i) => i === payload.colIndex);
+      col.activitys = col.activitys.filter((activity, i) => i !== payload.activityIndex);
+    },
+  },
+
+    
+
 })
 
 

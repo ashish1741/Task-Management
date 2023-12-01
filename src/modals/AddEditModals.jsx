@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import CloseSharpIcon from "@mui/icons-material/CloseSharp";
+import { useDispatch } from "react-redux";
+import categoriesSlice from "../redux/categoriesSlice";
 
 function AddEditModals({ setTaskModelOpen, type }) {
+  const dispatch = useDispatch();
+
+  // generating random id
   const generateId = () => {
     const min = 1000;
     const max = 9999;
@@ -9,6 +14,7 @@ function AddEditModals({ setTaskModelOpen, type }) {
   };
 
   const [name, setName] = useState("");
+  const [isValid, setisValid] = useState(true);
   const [newColumns, setnewColumns] = useState([
     { name: "Todo", task: [], id: generateId() },
     { name: "Doing", task: [], id: generateId() },
@@ -16,6 +22,7 @@ function AddEditModals({ setTaskModelOpen, type }) {
     
   ]);
 
+  //
   const onChange = (id, newValue) => {
     setnewColumns((prevState) => {
       const newState = [...prevState];
@@ -32,15 +39,43 @@ function AddEditModals({ setTaskModelOpen, type }) {
     });
   };
 
-  // adding new columns logic 
-  
+  // adding new columns logic
+
   const handleAddColumn = () => {
     setnewColumns((state) => [
       ...state,
-      { name: '', task: [], id: generateId() } 
+      { name: "", task: [], id: generateId() },
     ]);
   };
 
+  //validated
+  const validated = () => {
+    setisValid(false);
+    if (!name.trim()) {
+      return false;
+    }
+
+
+    for (let index = 0; index < newColumns.length; index++) {
+      if (!newColumns[index].name.trim()) {
+        return false;
+      }
+    }
+
+    setisValid(true);
+    return true;
+  };
+
+  // submiting the data to state
+  const onSubmit = (type) => {
+    setTaskModelOpen(false);
+    if (type === "add") {
+      //dispatching
+      dispatch(categoriesSlice.actions.addTask({name,newColumns}));
+    } else {
+      dispatch(categoriesSlice.actions.editTask({name,newColumns}));
+    }
+  };
 
   return (
     <div
@@ -82,36 +117,47 @@ function AddEditModals({ setTaskModelOpen, type }) {
         </div>
         {/* {Task Columns} */}
         <div className="mt-8 flex flex-col space-y-3">
-          <label className="text-sm text-gray-500">
-            Task Columns
-          </label>
-            {newColumns.map((ele, index) => (
-              <div className="flex items-center space-x-3 w-full">
-                <input
-                  type="text"
-                  className="bg-transparent flex-grow px-4 py-2
+          <label className="text-sm text-gray-500">Task Columns</label>
+          {newColumns.map((ele, index) => (
+            <div className="flex items-center space-x-3 w-full">
+              <input
+                type="text"
+                className="bg-transparent flex-grow px-4 py-2
                    rounded-md text-sm border mt-2  outline-none focus:outline-[#735fc7]"
-                  value={ele.name}
-                  onChange={(e) => {
-                    onChange(ele.id, e.target.value);
-                  }}
-                />
-                <CloseSharpIcon
-                  className="cursor-pointer m-4"
-                  onClick={() => {
-                    onDelete(ele.id);
-                  }}
-                />
-              </div>
-            ))}
+                value={ele.name}
+                onChange={(e) => {
+                  onChange(ele.id, e.target.value);
+                }}
+              />
+              <CloseSharpIcon
+                className="cursor-pointer m-4"
+                onClick={() => {
+                  onDelete(ele.id);
+                }}
+              />
+            </div>
+          ))}
         </div>
-        <button className="w-full items-center hover:opacity-75
+        <button
+          className="w-full items-center hover:opacity-75
        text-black bg-white mt-2 py-2 rounded-full "
-       onClick={handleAddColumn}>
-         + Add New Column
-      </button>
+          onClick={handleAddColumn}
+        >
+          + Add New Column
+        </button>
+        <button
+          className="w-full items-center hover:opacity-75
+       text-white  bg-blue-950 mt-2 py-2 rounded-full "
+          onClick={() => {
+            const isValid = validated();
+            if (isValid === true) {
+              onSubmit(type);
+            }
+          }}
+        >
+          {type === "add" ? "Create New Task" : "Save Changes"}
+        </button>
       </div>
-
     </div>
   );
 }
